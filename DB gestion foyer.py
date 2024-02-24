@@ -35,10 +35,14 @@ def menu_principal():
 
 def ajouter_utilisateur():
     curr = conn.cursor()
-    print("nom de l'utilisateur :")
+    print("enrtez votre nom d'utilisateur (retour pour annuller)")
     nom = str(input())
-    print("mot de passe de l'utilisateur :")
+    if nom == "retour":
+        return menu_principal()
+    print("créez votre mot de passe (retour pour annuller)")
     mdp = str(input())
+    if mdp == "retour":
+        return menu_principal()
     if mdp =="":
         curr.execute(f"INSERT INTO Users (UserName) VALUES ('{nom}')")
     else:
@@ -60,8 +64,12 @@ def afficher_users():
 
 def loging(utilisateurId):
     cur = conn.cursor()
-    cur.execute(f"SELECT UserPassword FROM Users WHERE UserID = {utilisateurId}")
-    password = cur.fetchall()[0][0]
+    try :
+        cur.execute(f"SELECT UserPassword FROM Users WHERE UserID = {utilisateurId}")
+        password = cur.fetchall()[0][0]
+    except :
+        print("entrez un ID valide")
+        return menu_principal()
     if password == None:
         print("pas de mot de passe")
         cur.close
@@ -158,8 +166,8 @@ def changer_mpd_user(utilisateurID):
     mdp_actuelle = curr.execute(
         f"SELECT UserPassword FROM Users WHERE UserID ={utilisateurID}"
     )
-    mdp_actuelle = curr.fetchall()
-    print("le mot de passe actuelle est", mdp_actuelle[0][0])
+    mdp_actuelle = curr.fetchall()[0][0]
+    print("le mot de passe actuelle est", mdp_actuelle)
     print("entrer de nouveau mot de passe")
     nouveau_mdp = input()
     curr.execute(
@@ -204,7 +212,10 @@ def supprimer_elements(table, utilisateurID):
     for i in range(len(columns)):
         print(f"{i+1}. {columns[i]}")
     
-    choix_colonne = input("a partir de quelle collone supprimer ")
+    choix_colonne = input("a partir de quelle collone supprimer ('annuler' pour annuler) ")
+    if choix_colonne == " annuler" :
+        print("annulation")
+        return
     try:
         choix_colonne = int(choix_colonne)
         
